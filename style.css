@@ -1,0 +1,151 @@
+/* ラッキーブロック配布所: 黄色いハテナブロックと空色の、明るいゲーム風デザイン */
+:root {
+  --sky: #dff3ff; --sky2: #bfe6ff; --ink: #1d2433; --sub: #5b6578; --line: #d6dde8;
+  --gold: #f6b800; --gold-d: #a86b00; --red: #e8473c; --green: #22a35a; --blue: #2f7de1; --purple: #8a4be0;
+  --card: #fff; --r: 14px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  color: var(--ink); line-height: 1.6; min-height: 100vh;
+  background: linear-gradient(180deg, var(--sky) 0%, #f4fbff 380px, #f7f9fc 100%);
+}
+a { color: var(--blue); }
+.hidden { display: none !important; }
+button { font: inherit; }
+
+/* ---- ヘッダー ---- */
+.top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 16px; background: rgba(255,255,255,.88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.qblock { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 7px; flex: none;
+  background: var(--gold); border: 3px solid var(--gold-d); color: #fff; font: 900 24px/1 Arial, sans-serif;
+  text-shadow: 2px 2px 0 var(--gold-d); box-shadow: inset -3px -3px 0 rgba(0,0,0,.12), inset 3px 3px 0 rgba(255,255,255,.35); }
+.logo-t { font-weight: 800; font-size: 17px; line-height: 1.15; }
+.logo-t small { display: block; font-size: 11px; font-weight: 700; color: var(--sub); }
+.top-r { display: flex; gap: 8px; align-items: center; }
+
+main { max-width: 820px; margin: 0 auto; padding: 18px 14px 40px; }
+
+/* ---- ボタン ---- */
+.btn { border: 0; border-radius: 999px; padding: 10px 18px; font-weight: 800; cursor: pointer; background: var(--ink); color: #fff;
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: transform .08s, filter .15s; }
+.btn:hover { filter: brightness(1.1); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.small { padding: 7px 13px; font-size: 13px; }
+.btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+.btn.gold { background: var(--gold); color: #3a2600; box-shadow: 0 3px 0 var(--gold-d); }
+.btn.red { background: var(--red); }
+.btn.green { background: var(--green); }
+.btn.want { background: #fff; color: var(--red); border: 2px solid var(--red); }
+.btn.want.on { background: var(--red); color: #fff; }
+
+/* ---- お知らせ帯 ---- */
+.notice { background: #fff; border: 2px dashed var(--gold); border-radius: var(--r); padding: 12px 14px; margin-bottom: 14px;
+  display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.notice p { margin: 0; }
+
+.hero { text-align: center; padding: 10px 0 16px; }
+.hero h1 { margin: 0 0 4px; font-size: 24px; }
+.hero p { margin: 0; color: var(--sub); font-size: 14px; }
+
+.bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--sub); }
+.tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+/* ---- 投稿カード ---- */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
+  box-shadow: 0 2px 0 rgba(29,36,51,.04); }
+a.card { display: block; color: inherit; text-decoration: none; transition: border-color .15s, transform .1s; }
+a.card:hover { border-color: var(--gold); transform: translateY(-1px); }
+.who { display: flex; align-items: center; gap: 8px; font-size: 14px; flex-wrap: wrap; }
+.who .av { font-size: 22px; line-height: 1; }
+.who b { font-weight: 800; }
+.who .rbx { color: var(--sub); font-size: 12px; }
+.badge { font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.badge.verified { background: #e4f6ec; color: var(--green); }
+.badge.official { background: linear-gradient(90deg, #fff1b8, #ffd34d); color: #6b4700; border: 1px solid #e3b100; }
+.badge.none { background: #eef1f5; color: var(--sub); }
+.body { white-space: pre-wrap; word-break: break-word; font-size: 16px; margin: 8px 0 10px; font-weight: 600; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--sub); }
+.meta b { color: var(--ink); }
+.foot-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.status { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 6px; }
+.status.open { background: #e7f1ff; color: var(--blue); }
+.status.closed { background: #fff2e0; color: #b46400; }
+.status.drawn { background: #f3e9ff; color: var(--purple); }
+.status.done { background: #e4f6ec; color: var(--green); }
+.status.removed { background: #fde8e6; color: var(--red); }
+.wants { font-weight: 800; color: var(--red); }
+
+.empty { text-align: center; color: var(--sub); padding: 40px 10px; }
+.back { display: inline-block; margin-bottom: 10px; font-size: 14px; text-decoration: none; font-weight: 700; }
+h2 { font-size: 18px; margin: 18px 0 8px; }
+.sect { background: #fff; border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px; }
+.sect h3 { margin: 0 0 8px; font-size: 16px; }
+.hint { font-size: 13px; color: var(--sub); margin: 4px 0; }
+.won { background: linear-gradient(90deg, #fff6c9, #ffe27a); border: 2px solid var(--gold); border-radius: var(--r); padding: 12px 14px; font-weight: 800; margin-bottom: 12px; }
+
+/* ---- 参加者の表 ---- */
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl th, .tbl td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tbl th { font-size: 12px; color: var(--sub); font-weight: 700; }
+.tbl tr.win td { background: #fff8d6; font-weight: 700; }
+.mono { font-family: Consolas, "Courier New", monospace; }
+.copy { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 2px 7px; font-size: 12px; cursor: pointer; }
+
+/* ---- ルーレット ---- */
+.roulette { display: grid; place-items: center; gap: 10px; }
+.wheel-wrap { position: relative; width: min(360px, 86vw); aspect-ratio: 1; }
+.wheel-wrap canvas { width: 100%; height: 100%; display: block; }
+.pointer { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 0; height: 0;
+  border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 26px solid var(--red);
+  filter: drop-shadow(0 2px 1px rgba(0,0,0,.25)); }
+.wheel-center { position: absolute; inset: 0; margin: auto; width: 22%; height: 22%; }
+.wheel-center .qblock { width: 100%; height: 100%; font-size: clamp(18px, 6vw, 34px); }
+.roulette-msg { font-weight: 800; font-size: 18px; min-height: 1.6em; text-align: center; }
+.winners { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.winners span { background: #fff8d6; border: 1.5px solid var(--gold); border-radius: 999px; padding: 4px 12px; font-weight: 800; font-size: 14px; }
+.fair { font-size: 12px; color: var(--sub); text-align: center; max-width: 460px; }
+
+.video { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; background: #000; }
+.video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* ---- フォーム ---- */
+label.f { display: block; margin: 10px 0; font-weight: 700; font-size: 14px; }
+label.f small { font-weight: 500; color: var(--sub); }
+input[type=text], input[type=url], input[type=number], input[type=datetime-local], textarea {
+  width: 100%; margin-top: 4px; padding: 9px 11px; border: 1.5px solid var(--line); border-radius: 10px; font: inherit; background: #fff; color: var(--ink); }
+input:focus, textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(246,184,0,.2); }
+textarea { min-height: 96px; resize: vertical; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.count { text-align: right; font-size: 12px; color: var(--sub); }
+.err { color: var(--red); font-weight: 700; font-size: 14px; min-height: 1.4em; }
+.actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 12px; }
+
+/* ---- 連携の手順 ---- */
+.steps { padding-left: 1.3em; margin: 8px 0; }
+.steps li { margin-bottom: 8px; }
+.code { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: #fff8d6; border: 2px solid var(--gold); border-radius: 10px;
+  padding: 10px 12px; font-size: 20px; font-weight: 900; letter-spacing: .05em; }
+
+/* ---- モーダル・トースト ---- */
+.modal { position: fixed; inset: 0; z-index: 50; background: rgba(20,26,40,.5); display: grid; place-items: center; padding: 14px; }
+.modal-box { position: relative; background: #fff; border-radius: 18px; width: min(560px, 100%); max-height: 92vh; overflow: auto; padding: 20px 18px 18px; }
+.modal-box h2 { margin-top: 0; }
+.modal-x { position: absolute; top: 10px; right: 10px; border: 0; background: #eef1f5; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+.toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 60; background: var(--ink); color: #fff;
+  padding: 10px 18px; border-radius: 999px; font-weight: 700; font-size: 14px; max-width: 92vw; }
+
+.foot { max-width: 820px; margin: 0 auto; padding: 10px 14px 30px; font-size: 12px; color: var(--sub); text-align: center; }
+.foot p { margin: 4px 0; }
+.foot .ver { margin-top: 8px; }
+
+@media (max-width: 520px) {
+  .logo-t { font-size: 15px; }
+  .row2 { grid-template-columns: 1fr; }
+  .tbl .hide-sm { display: none; }
+}
