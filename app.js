@@ -5,12 +5,12 @@
   const SUPABASE_URL = 'https://kifnzvktwbomxthzvvgy.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_Ea_sHRg6wMwO9YkDTjgOog_stQT1mfq';
   const HEADERS = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
-  // 公認オープンチャット「偽ラッキーブロックを打つ」（ラッキーブロックを打つ Web と同じ）
-  const OPENCHAT_URL = 'https://line.me/ti/g2/RNE2vwllCnyl4-Y8ukT0Pqmay1BYPPtICBvzaw?utm_source=invitation&utm_medium=link_copy&utm_campaign=default';
+  // オープンチャット「ラッキーブロックを打つやってる人きてー」
+  const OPENCHAT_URL = 'https://line.me/ti/g2/CtzIkqvq1XBZB7mz6o0fwv7GbezWdMaduF-5LQ?utm_source=invitation&utm_medium=link_copy&utm_campaign=default';
   const SITE_URL = 'https://kaikomziu.github.io/lucky-block-giveaway/';
   const OPENCHAT_HTML = `<a class="oc" href="${OPENCHAT_URL}" target="_blank" rel="noopener">
       <span class="oc-icon">💬</span>
-      <span class="oc-text"><small>公認オープンチャット（LINE）</small><b>「偽ラッキーブロックを打つ」</b><em>配布の宣伝・雑談OK！作者のかるわかもいます</em></span>
+      <span class="oc-text"><small>オープンチャット（LINE）</small><b>「ラッキーブロックを打つやってる人きてー」</b><em>配布の宣伝・雑談OK！いっしょに遊ぶ仲間を見つけよう</em></span>
       <span class="oc-go">参加する ›</span></a>`;
   const ka = window.KaAccount || null;
   const $ = id => document.getElementById(id);
@@ -380,7 +380,7 @@
           <a class="btn line" href="${lineShareUrl(p)}" target="_blank" rel="noopener"><span class="line-logo">LINE</span>で送る</a>
           <button class="btn ghost" data-copy-link="${p.id}">🔗 リンクをコピー</button>
         </div>
-        <a class="oc-link" href="${OPENCHAT_URL}" target="_blank" rel="noopener">💬 公認オプチャ「偽ラッキーブロックを打つ」に参加する ›</a>
+        <a class="oc-link" href="${OPENCHAT_URL}" target="_blank" rel="noopener">💬 オプチャ「ラッキーブロックを打つやってる人きてー」に参加する ›</a>
       </div>`;
     }
     if (embed) html += `<div class="sect"><h3>🎬 動画</h3><div class="video"><iframe src="${embed}" title="配布の動画" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div></div>`;
