@@ -1,4 +1,4 @@
-# ラッキーブロック配布所（非公式） v0.02
+# ラッキーブロック配布所（非公式） v0.03
 
 Roblox「ラッキーブロックを打つ」の配布をまとめる非公式サイト。素の HTML/CSS/JS（`index.html` `style.css` `app.js`）。
 
@@ -12,6 +12,7 @@ Roblox「ラッキーブロックを打つ」の配布をまとめる非公式�
 - 配布する・ほしい！どちらもログイン＋Roblox 連携が必要。ほしい人の Roblox ID は配布する人と管理者にだけ見える。
 - 抽選はサーバー（`lbd_draw`）で1回だけ。結果は `lbd_draws` に保存し、ルーレットのアニメはその結果をもう一度見せるだけ（seed で動きも同じ）。
 - 動画は保存しない。YouTube のリンクだけ貼れる。
+- LINE: オープンチャットには外部から投稿するAPIがないので、配布ページの「LINEで送る」（line.me/R/share）と、公認オプチャ「偽ラッキーブロックを打つ」への案内（ヘッダー・一覧の下・配布ページ）で代わりにしている。
 
 ## DB（共有 Supabase kifnzvktwbomxthzvvgy、マイグレーション `lbd_giveaway_site`）
 テーブル `lbd_users` `lbd_posts` `lbd_wants` `lbd_draws` `lbd_reports`（RLS で全拒否、RPC だけ）。

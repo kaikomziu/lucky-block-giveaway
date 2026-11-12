@@ -5,6 +5,13 @@
   const SUPABASE_URL = 'https://kifnzvktwbomxthzvvgy.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_Ea_sHRg6wMwO9YkDTjgOog_stQT1mfq';
   const HEADERS = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+  // 公認オープンチャット「偽ラッキーブロックを打つ」（ラッキーブロックを打つ Web と同じ）
+  const OPENCHAT_URL = 'https://line.me/ti/g2/RNE2vwllCnyl4-Y8ukT0Pqmay1BYPPtICBvzaw?utm_source=invitation&utm_medium=link_copy&utm_campaign=default';
+  const SITE_URL = 'https://kaikomziu.github.io/lucky-block-giveaway/';
+  const OPENCHAT_HTML = `<a class="oc" href="${OPENCHAT_URL}" target="_blank" rel="noopener">
+      <span class="oc-icon">💬</span>
+      <span class="oc-text"><small>公認オープンチャット（LINE）</small><b>「偽ラッキーブロックを打つ」</b><em>配布の宣伝・雑談OK！作者のかるわかもいます</em></span>
+      <span class="oc-go">参加する ›</span></a>`;
   const ka = window.KaAccount || null;
   const $ = id => document.getElementById(id);
   const app = $('app');
@@ -88,6 +95,17 @@
       else id = u.searchParams.get('v') || '';
       return /^[A-Za-z0-9_-]{6,20}$/.test(id) ? `https://www.youtube-nocookie.com/embed/${id}` : null;
     } catch { return null; }
+  }
+
+  // LINE の「送る」画面を開くURL（文章とリンクが入った状態になる）
+  function postUrl(id) { return `${SITE_URL}#/p/${id}`; }
+  function lineShareUrl(p) {
+    const body = p.body.length > 80 ? p.body.slice(0, 79) + '…' : p.body;
+    const st = statusOf(p)[0];
+    const lines = st === 'open'
+      ? [`🎁【配布】${body}`, `⏰ 締め切り ${fmtDate(p.deadline)}／🏆 ${p.winners}人当たり`, '「ほしい！」はここから👇', postUrl(p.id)]
+      : [`🎡【抽選結果】${body}`, postUrl(p.id)];
+    return 'https://line.me/R/share?text=' + encodeURIComponent(lines.join('\n'));
   }
 
   // ---------- モーダル ----------
@@ -219,7 +237,7 @@
           p_video_url: $('cVideo').value.trim() || null,
         });
         if (!r.ok) { $('cErr').textContent = reasonText(r.reason); return; }
-        closeModal(); toast('配布を公開しました！');
+        closeModal(); toast('配布を公開しました！LINE で宣伝してみよう');
         location.hash = `#/p/${r.id}`;
       } catch { $('cErr').textContent = reasonText(); }
       finally { b.disabled = false; }
@@ -305,7 +323,8 @@
         </div>
         <button class="btn gold big" data-act="create"><span class="plus">＋</span> 配布を出す</button>
       </div>
-      <div id="list" class="list"><div class="skeleton"></div><div class="skeleton"></div></div>`;
+      <div id="list" class="list"><div class="skeleton"></div><div class="skeleton"></div></div>
+      ${OPENCHAT_HTML}`;
     try {
       const r = await rpc('lbd_list', { p_token: t, p_filter: filter });
       const posts = r.posts || [];
@@ -352,6 +371,18 @@
         </div></div>`;
     }
 
+    if (p.status !== 'removed') {
+      const open = statusOf(p)[0] === 'open';
+      html += `<div class="sect share">
+        <h3>📣 ${p.is_mine && open ? 'オプチャで宣伝しよう' : 'この配布をシェア'}</h3>
+        <p class="hint">${open ? 'LINE が開くので、オープンチャットや友だちを選んで送るだけ。見た人がここから「ほしい！」できます。' : '抽選の結果ページとして送れます。'}</p>
+        <div class="share-btns">
+          <a class="btn line" href="${lineShareUrl(p)}" target="_blank" rel="noopener"><span class="line-logo">LINE</span>で送る</a>
+          <button class="btn ghost" data-copy-link="${p.id}">🔗 リンクをコピー</button>
+        </div>
+        <a class="oc-link" href="${OPENCHAT_URL}" target="_blank" rel="noopener">💬 公認オプチャ「偽ラッキーブロックを打つ」に参加する ›</a>
+      </div>`;
+    }
     if (embed) html += `<div class="sect"><h3>🎬 動画</h3><div class="video"><iframe src="${embed}" title="配布の動画" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div></div>`;
 
     if (p.is_mine || me?.is_admin) {
@@ -529,7 +560,7 @@
 
   // ---------- クリック（まとめて受ける） ----------
   app.addEventListener('click', async e => {
-    const t = e.target.closest('[data-want],[data-filter],[data-act],[data-copy],[data-official],[data-dismiss]');
+    const t = e.target.closest('[data-want],[data-filter],[data-act],[data-copy],[data-copy-link],[data-official],[data-dismiss]');
     if (!t) return;
     if (t.dataset.want) {
       e.preventDefault(); e.stopPropagation();
@@ -549,6 +580,8 @@
       openLinkModal();
     } else if (t.dataset.act === 'login') {
       if (await requireLogin()) { await loadMe(); route(); }
+    } else if (t.dataset.copyLink) {
+      copyText(postUrl(t.dataset.copyLink));
     } else if (t.dataset.copy) {
       copyText(t.dataset.copy);
     } else if (t.dataset.official) {
