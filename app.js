@@ -243,63 +243,92 @@
 
   // ---------- 一覧 ----------
   let filter = 'all';
+  // 締め切りまでが近いほど目立たせる
+  function urgency(iso) {
+    const ms = new Date(iso) - Date.now();
+    return ms <= 0 ? '' : ms < 3600e3 ? 'hot' : ms < 86400e3 ? 'warm' : '';
+  }
   function cardHtml(p, asLink = true) {
     const [sc, st] = statusOf(p);
     const tag = asLink ? 'a' : 'div';
     const open = sc === 'open';
-    return `<${tag} class="card" ${asLink ? `href="#/p/${p.id}"` : ''}>
-      <div class="who"><span class="av">${esc(p.author.avatar || '👤')}</span><b>${esc(p.author.display_name)}</b>${badgeHtml(p.author.badge)}
-        ${p.author.roblox_name ? `<span class="rbx">@${esc(p.author.roblox_name)}</span>` : ''}</div>
-      <div class="body">${esc(p.body)}</div>
-      <div class="meta">
-        ${p.give_at ? `<span>🎁 配布 <b>${fmtDate(p.give_at)}</b></span>` : ''}
-        <span>⏰ 締め切り <b>${fmtDate(p.deadline)}</b>${open ? `（${leftText(p.deadline)}）` : ''}</span>
-        <span>🏆 当たり <b>${p.winners}人</b></span>
-        ${p.video_url ? '<span>🎬 動画あり</span>' : ''}
-      </div>
-      <div class="foot-row">
+    let action = '';
+    if (open && !p.is_mine) action = `<button class="want-btn ${p.i_want ? 'on' : ''}" data-want="${p.id}">
+        <span class="heart">${p.i_want ? '❤' : '♡'}</span>${p.i_want ? 'ほしい！済み' : 'ほしい！'}</button>`;
+    else if (p.is_mine && open) action = `<span class="mine-tag">あなたの配布</span>`;
+    else if (p.draw?.i_won) action = `<span class="won-tag">🎉 当たり！</span>`;
+    return `<${tag} class="card s-${sc}" ${asLink ? `href="#/p/${p.id}"` : ''}>
+      <div class="card-top">
+        <div class="who"><span class="av">${esc(p.author.avatar || '👤')}</span>
+          <div class="who-t"><b>${esc(p.author.display_name)}</b>
+            <span class="who-sub">${badgeHtml(p.author.badge)}${p.author.roblox_name ? `<span class="rbx">@${esc(p.author.roblox_name)}</span>` : ''}</span></div></div>
         <span class="status ${sc}">${st}</span>
-        <span class="wants">❤ ほしい！ ${p.want_count}人</span>
-        ${open && !p.is_mine ? `<button class="btn small want ${p.i_want ? 'on' : ''}" data-want="${p.id}">${p.i_want ? '❤ ほしい！済み' : '♡ ほしい！'}</button>` : ''}
+      </div>
+      <div class="body">${esc(p.body)}</div>
+      <div class="chips">
+        ${open ? `<span class="chip time ${urgency(p.deadline)}">⏰ ${leftText(p.deadline)}</span>` : ''}
+        <span class="chip">📅 締め切り ${fmtDate(p.deadline)}</span>
+        ${p.give_at ? `<span class="chip">🎁 配布 ${fmtDate(p.give_at)}</span>` : ''}
+        <span class="chip">🏆 ${p.winners}人当たり</span>
+        ${p.video_url ? '<span class="chip">🎬 動画</span>' : ''}
+      </div>
+      <div class="card-foot">
+        <span class="wants"><b>${p.want_count}</b>人がほしい！</span>
+        ${action}
       </div>
     </${tag}>`;
   }
+  const STEPS_HTML = `
+    <ol class="how">
+      <li><span class="how-n">1</span><div><b>ログイン＆連携</b><small>かるわかGAMESでログインして、Robloxアカウントとつなぐ</small></div></li>
+      <li><span class="how-n">2</span><div><b>ほしい！を押す</b><small>ほしい配布を見つけたらボタンを押すだけ</small></div></li>
+      <li><span class="how-n">3</span><div><b>ルーレットで抽選</b><small>当たったらRobloxで受け取る</small></div></li>
+    </ol>`;
   async function renderList() {
     const t = token();
-    const linkNote = t && me && !me.roblox_id
-      ? `<div class="notice"><p>配布を出したり「ほしい！」するには、Roblox アカウントとの連携が必要です。</p><button class="btn small gold" data-act="link">🔗 連携する</button></div>` : '';
-    const loginNote = !t
-      ? `<div class="notice"><p>かるわかGAMESアカウントでログインすると、配布を出したり「ほしい！」したりできます。</p><button class="btn small gold" data-act="login">👤 ログイン</button></div>` : '';
+    let note = '';
+    if (!t) note = `<div class="notice"><span class="notice-i">👤</span><p><b>ログインして参加しよう</b><br>かるわかGAMESアカウントで、配布を出したり「ほしい！」したりできます。</p><button class="btn gold" data-act="login">ログイン</button></div>`;
+    else if (me && !me.roblox_id) note = `<div class="notice"><span class="notice-i">🔗</span><p><b>あと少し！Robloxと連携しよう</b><br>配布を出したり「ほしい！」するには、Robloxアカウントとの連携が必要です（1分くらい）。</p><button class="btn gold" data-act="link">連携する</button></div>`;
+    const tabs = [['all', 'すべて'], ['open', '受付中'], ...(t ? [['wanted', 'ほしい！した'], ['mine', '自分の配布']] : [])];
     app.innerHTML = `
-      <section class="hero"><h1>ラッキーブロック配布所</h1><p>Roblox「ラッキーブロックを打つ」の配布を見つけて、ほしい！を押そう。当たる人はルーレットで決まります。</p></section>
-      ${loginNote}${linkNote}
+      <section class="hero">
+        <div class="hero-blocks" aria-hidden="true"><span>?</span><span>?</span><span>?</span></div>
+        <p class="hero-kicker">Roblox「ラッキーブロックを打つ」非公式</p>
+        <h1>みんなの<em>配布</em>が集まる場所</h1>
+        <p class="hero-sub">ほしい配布に「ほしい！」を押そう。当たる人はルーレットで公平に決まります。</p>
+        ${!t || !me?.roblox_id ? STEPS_HTML : ''}
+      </section>
+      ${note}
       <div class="bar">
-        <div class="tabs">
-          ${[['all', 'すべて'], ['open', '受付中'], ...(t ? [['wanted', 'ほしい！した'], ['mine', '自分の配布']] : [])]
-            .map(([k, l]) => `<button class="tab ${filter === k ? 'active' : ''}" data-filter="${k}">${l}</button>`).join('')}
+        <div class="tabs" role="tablist">
+          ${tabs.map(([k, l]) => `<button class="tab ${filter === k ? 'active' : ''}" data-filter="${k}" role="tab">${l}</button>`).join('')}
         </div>
-        <button class="btn gold" data-act="create">＋ 配布を出す</button>
+        <button class="btn gold big" data-act="create"><span class="plus">＋</span> 配布を出す</button>
       </div>
-      <div id="list"><p class="empty">読み込み中…</p></div>`;
+      <div id="list" class="list"><div class="skeleton"></div><div class="skeleton"></div></div>`;
     try {
       const r = await rpc('lbd_list', { p_token: t, p_filter: filter });
       const posts = r.posts || [];
       $('list').innerHTML = posts.length ? posts.map(p => cardHtml(p)).join('')
-        : `<p class="empty">${filter === 'all' ? 'まだ配布がありません。最初の配布を出してみよう！' : 'ここにはまだ何もありません。'}</p>`;
-    } catch { $('list').innerHTML = '<p class="empty">読み込めませんでした。通信を確認して、もう一度開いてください。</p>'; }
+        : `<div class="empty"><div class="empty-block">?</div><b>${filter === 'all' ? 'まだ配布がありません' : 'ここにはまだ何もありません'}</b>
+            <p>${filter === 'all' || filter === 'mine' ? '最初の配布を出してみよう！' : '受付中の配布を見つけて「ほしい！」を押してみよう。'}</p></div>`;
+    } catch { $('list').innerHTML = '<div class="empty"><b>読み込めませんでした</b><p>通信を確認して、もう一度開いてください。</p></div>'; }
   }
 
   // ---------- 詳細 ----------
   let current = null; // 表示中の投稿
   async function renderPost(id) {
-    app.innerHTML = '<a class="back" href="#/">← 一覧へ</a><p class="empty">読み込み中…</p>';
+    app.innerHTML = '<a class="back" href="#/">← 一覧へもどる</a><div class="skeleton tall"></div>';
     let r;
     try { r = await rpc('lbd_get', { p_token: token(), p_id: id }); } catch { r = { ok: false }; }
     if (!r.ok) { app.innerHTML = `<a class="back" href="#/">← 一覧へ</a><p class="empty">${esc(reasonText(r.reason || 'not_found'))}</p>`; return; }
     const p = current = r.post;
     const [sc] = statusOf(p);
     const embed = p.video_url ? youtubeEmbed(p.video_url) : null;
-    let html = `<a class="back" href="#/">← 一覧へ</a>`;
+    const stage = p.status === 'done' ? 3 : p.status === 'drawn' ? 2 : 1;
+    const steps = ['受付中', 'ルーレットで抽選', '配布済み'];
+    let html = `<a class="back" href="#/">← 一覧へもどる</a>`;
+    if (p.status !== 'removed') html += `<ol class="progress">${steps.map((t, i) => `<li class="${i + 1 < stage ? 'done' : i + 1 === stage ? 'now' : ''}"><span>${i + 1 < stage ? '✓' : i + 1}</span>${t}</li>`).join('')}</ol>`;
     if (p.draw?.i_won) html += `<div class="won">🎉 おめでとう！あなたが当たりました。配布する人からの連絡（Roblox）を待ってください。</div>`;
     html += cardHtml(p, false);
 
@@ -409,7 +438,7 @@
 
   // ---------- ルーレット ----------
   // 決まった結果に止まるだけ。どこで止まるか（ぶれ幅・回転数）は seed から決まるので、だれが見ても同じ動きになる
-  const COLORS = ['#f6b800', '#2f7de1', '#e8473c', '#22a35a', '#8a4be0', '#ff8a1f', '#14b8c4', '#e0479e'];
+  const COLORS = ['#ffb800', '#3478f6', '#ff4d5e', '#17b26a', '#8b5cf6', '#ff8a1f', '#14b8c4', '#ec4899'];
   class Wheel {
     constructor(canvas, names) { this.c = canvas; this.ctx = canvas.getContext('2d'); this.names = names; this.angle = 0; this.marked = new Set(); this.draw(); }
     draw() {
@@ -478,7 +507,7 @@
 
   // ---------- 管理 ----------
   async function renderAdmin() {
-    app.innerHTML = '<a class="back" href="#/">← 一覧へ</a><p class="empty">読み込み中…</p>';
+    app.innerHTML = '<a class="back" href="#/">← 一覧へもどる</a><div class="skeleton tall"></div>';
     let r;
     try { r = await rpc('lbd_admin_overview', { p_token: token() }); } catch { r = { ok: false }; }
     if (!r.ok) { app.innerHTML = `<a class="back" href="#/">← 一覧へ</a><p class="empty">${esc(reasonText(r.reason))}</p>`; return; }
